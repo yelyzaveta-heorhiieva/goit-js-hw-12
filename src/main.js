@@ -15,12 +15,12 @@ const gallery = document.querySelector('.gallery');
 async function formSubmit(event) {
     event.preventDefault();
     form.nextElementSibling.innerHTML = '';
-   request = event.target.elements.searchQuery.value.trim();
-    if (!request) {
-        return;
-    }
     if (gallery.nextElementSibling) {
          gallery.nextElementSibling.remove();
+    }
+    request = event.target.elements.searchQuery.value.trim();
+    if (!request) {
+        return;
     }
     page = 1;
     await fetchPhoto();
