@@ -19,7 +19,7 @@ async function formSubmit(event) {
     if (!request) {
         return;
     }
-    if (gallery.nextElementSibling.nodeName === 'BUTTON') {
+    if (gallery.nextElementSibling) {
          gallery.nextElementSibling.remove();
     }
     page = 1;
