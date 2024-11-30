@@ -15,9 +15,8 @@ export function renderPhoto(arr) {
   </div>
 </li>`).join('');
   const gallery = document.querySelector('.gallery');
-  gallery.innerHTML = '';
   gallery.insertAdjacentHTML("beforeend", markup);
-    const lightbox = new SimpleLightbox('.gallery-item a', { captionType: 'attr', captionPosition: 'bottom', captionsData: "alt", captionDelay: 250 });
+  const lightbox = new SimpleLightbox('.gallery-item a', { captionType: 'attr', captionPosition: 'bottom', captionsData: "alt", captionDelay: 250 });
   lightbox.refresh();
 }
 

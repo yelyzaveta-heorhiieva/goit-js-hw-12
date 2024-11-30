@@ -115,3 +115,9 @@ button {
 button:hover {
   background-color: #6c8cff;
 }
+
+.load-btn {
+  display: block;
+  margin: 32px auto 0 auto;
+  width: 125px;
+}

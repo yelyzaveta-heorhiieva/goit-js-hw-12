@@ -1,43 +1,72 @@
-import { galleryCreate, errorAlert } from "./js/pixabay-api";
+import { galleryCreate, errorAlert, errorLoad } from "./js/pixabay-api";
+import axios from 'axios';
+
+
+const limit = 15;
+let page = 1;
+let request;
+let totalPages;
+
 
 const form = document.querySelector('.search-form');
-
 form.addEventListener('submit', formSubmit);
+const gallery = document.querySelector('.gallery');
 
-
-function formSubmit(event) {
+async function formSubmit(event) {
     event.preventDefault();
     form.nextElementSibling.innerHTML = '';
-    if (!event.target.elements.searchQuery.value) {
+   request = event.target.elements.searchQuery.value.trim();
+    if (!request) {
         return;
     }
-    const searchParams = new URLSearchParams({
+    gallery.nextElementSibling.remove();
+    page = 1;
+    await fetchPhoto();
+     if (gallery.firstElementChild) {
+         gallery.insertAdjacentHTML('afterend', '<button type="button" class="load-btn">Load more</button>');
+         const loadBtn = document.querySelector('.load-btn');
+         loadBtn.addEventListener('click', loadMore); 
+  }
+}
+
+async function fetchPhoto() {
+   const searchParams = new URLSearchParams({
         key: '47184565-fb8804c1f628caa9d6cc17425',
-        q: event.target.elements.searchQuery.value,
+        q: request,
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
+        page: page,
+        per_page: limit,
     });
-    const URL = `https://pixabay.com/api/?${searchParams}`;
 
-    form.insertAdjacentHTML('afterend', '<div class="load"><span class="loader"></span>....Loading....Please, wait!</div>');
+    gallery.insertAdjacentHTML('afterend', '<div class="load"><span class="loader"></span>   Loading images, please wait...</div>');
     const load = document.querySelector('.load');
-    return fetch(URL)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.status);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            load.remove();
-            galleryCreate(data);
-        })
 
-        .catch((error) => {
-            load.remove();
-            errorAlert(error);
-        });
+    try {
+        const response = await axios.get(`https://pixabay.com/api/?${searchParams}`);
+        load.remove();
+        totalPages = Math.ceil(response.data.totalHits / limit);
+        return galleryCreate(response);
+    } catch (error) {
+        load.remove();
+		return errorAlert(error);
+    } 
 }
 
-    
+async function loadMore(evt) {
+    evt.target.style.display = 'none';
+    if (page >= totalPages) {
+             errorLoad();
+            return;
+        }
+    try {
+        page += 1;
+        await fetchPhoto();
+        const coord = gallery.firstElementChild.getBoundingClientRect();
+        scrollBy(0, Math.ceil(coord.height * 2));
+        evt.target.style.display = 'block';
+    } catch (error) {
+        errorAlert(error);
+    }
+}
