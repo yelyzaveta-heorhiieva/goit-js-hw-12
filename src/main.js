@@ -19,7 +19,9 @@ async function formSubmit(event) {
     if (!request) {
         return;
     }
-    gallery.nextElementSibling.remove();
+    if (gallery.nextElementSibling.nodeName === 'BUTTON') {
+         gallery.nextElementSibling.remove();
+    }
     page = 1;
     await fetchPhoto();
      if (gallery.firstElementChild) {
