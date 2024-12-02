@@ -5,7 +5,7 @@ import errorIcon from '../error.svg';
 
 export function galleryCreate(response) {
     if (!response.data.hits.length) {
-                iziToast.error({
+               return iziToast.error({
                     backgroundColor: 'red',
                     iconUrl: errorIcon,
                     theme: 'dark',
@@ -19,7 +19,6 @@ export function galleryCreate(response) {
                 });   
     };   
     return renderPhoto(response.data.hits);
-
 }
 
 export function errorAlert(error) {

@@ -24,12 +24,7 @@ async function formSubmit(event) {
     }
     page = 1;
     await fetchPhoto();
-     if (gallery.firstElementChild) {
-         gallery.insertAdjacentHTML('afterend', '<button type="button" class="load-btn">Load more</button>');
-         const loadBtn = document.querySelector('.load-btn');
-         loadBtn.addEventListener('click', loadMore); 
-  }
-}
+};
 
 async function fetchPhoto() {
    const searchParams = new URLSearchParams({
@@ -42,33 +37,38 @@ async function fetchPhoto() {
         per_page: limit,
     });
 
-    gallery.insertAdjacentHTML('afterend', '<div class="load"><span class="loader"></span>   Loading images, please wait...</div>');
+    gallery.insertAdjacentHTML('afterend', '<div class="load"><span class="loader"></span>Loading images, please wait...</div>');
     const load = document.querySelector('.load');
 
     try {
         const response = await axios.get(`https://pixabay.com/api/?${searchParams}`);
         load.remove();
         totalPages = Math.ceil(response.data.totalHits / limit);
-        return galleryCreate(response);
+        galleryCreate(response);
+        if (page < totalPages) {
+           gallery.insertAdjacentHTML('afterend', '<button type="button" class="load-btn">Load more</button>');
+           const loadBtn = document.querySelector('.load-btn');
+           loadBtn.addEventListener('click', loadMore); 
+        } else if(response.data.hits.length) {
+             errorLoad();
+        };
     } catch (error) {
         load.remove();
 		return errorAlert(error);
     } 
-}
+};
 
 async function loadMore(evt) {
-    evt.target.style.display = 'none';
-    if (page >= totalPages) {
-             errorLoad();
-            return;
-        }
+    evt.target.remove();
     try {
         page += 1;
         await fetchPhoto();
         const coord = gallery.firstElementChild.getBoundingClientRect();
-        scrollBy(0, Math.ceil(coord.height * 2));
-        evt.target.style.display = 'block';
+        scrollBy({
+            top: Math.ceil(coord.height * 2),
+            behavior: "smooth",
+        });
     } catch (error) {
         errorAlert(error);
     }
-}
+};
