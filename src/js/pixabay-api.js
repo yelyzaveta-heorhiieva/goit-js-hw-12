@@ -2,9 +2,11 @@ import { renderPhoto } from "./render-functions";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 import errorIcon from '../error.svg';
+import { loadBtn } from "../main";
 
 export function galleryCreate(response) {
     if (!response.data.hits.length) {
+            loadBtn.classList.add('visually-hidden');
                return iziToast.error({
                     backgroundColor: 'red',
                     iconUrl: errorIcon,
@@ -17,7 +19,7 @@ export function galleryCreate(response) {
                     messageColor: 'white',
                     overlayColor: 'rgba(0, 0, 0, 0.6)',
                 });   
-    };   
+    };  
     return renderPhoto(response.data.hits);
 }
 

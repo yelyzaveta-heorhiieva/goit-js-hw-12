@@ -11,13 +11,14 @@ let totalPages;
 const form = document.querySelector('.search-form');
 form.addEventListener('submit', formSubmit);
 const gallery = document.querySelector('.gallery');
+export const loadBtn = document.querySelector('.load-btn');
+loadBtn.addEventListener('click', loadMore); 
+
 
 async function formSubmit(event) {
     event.preventDefault();
     form.nextElementSibling.innerHTML = '';
-    if (gallery.nextElementSibling) {
-         gallery.nextElementSibling.remove();
-    }
+    loadBtn.classList.add('visually-hidden');
     request = event.target.elements.searchQuery.value.trim();
     if (!request) {
         return;
@@ -44,14 +45,14 @@ async function fetchPhoto() {
         const response = await axios.get(`https://pixabay.com/api/?${searchParams}`);
         load.remove();
         totalPages = Math.ceil(response.data.totalHits / limit);
+        loadBtn.classList.remove('visually-hidden');
         galleryCreate(response);
-        if (page < totalPages) {
-           gallery.insertAdjacentHTML('afterend', '<button type="button" class="load-btn">Load more</button>');
-           const loadBtn = document.querySelector('.load-btn');
-           loadBtn.addEventListener('click', loadMore); 
-        } else if(response.data.hits.length) {
-             errorLoad();
-        };
+        if (page === totalPages) {
+            loadBtn.classList.add('visually-hidden');
+            errorLoad();
+            return;
+        } 
+           
     } catch (error) {
         load.remove();
 		return errorAlert(error);
@@ -59,7 +60,7 @@ async function fetchPhoto() {
 };
 
 async function loadMore(evt) {
-    evt.target.remove();
+    loadBtn.classList.add('visually-hidden');
     try {
         page += 1;
         await fetchPhoto();
@@ -68,6 +69,7 @@ async function loadMore(evt) {
             top: Math.ceil(coord.height * 2),
             behavior: "smooth",
         });
+        loadBtn.classList.remove('visually-hidden');
     } catch (error) {
         errorAlert(error);
     }
